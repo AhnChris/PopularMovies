@@ -3,14 +3,14 @@ package com.chrisahn.popularmovies;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class MovieContainer implements Parcelable{
+public class MovieData implements Parcelable{
     private String mPosterPath;
     private String mReleaseDate;
     private String mOriginalTitle;
     private float mVoteAverage;
     private String mOverview;
 
-    public MovieContainer() {
+    public MovieData() {
 
     }
 
@@ -28,18 +28,18 @@ public class MovieContainer implements Parcelable{
         dest.writeString(mOverview);
     }
 
-    public static final Parcelable.Creator<MovieContainer> CREATOR
-            = new Parcelable.Creator<MovieContainer>() {
-        public MovieContainer createFromParcel(Parcel in) {
-            return new MovieContainer(in);
+    public static final Parcelable.Creator<MovieData> CREATOR
+            = new Parcelable.Creator<MovieData>() {
+        public MovieData createFromParcel(Parcel in) {
+            return new MovieData(in);
         }
 
-        public MovieContainer[] newArray(int size) {
-            return new MovieContainer[size];
+        public MovieData[] newArray(int size) {
+            return new MovieData[size];
         }
     };
 
-    private MovieContainer(Parcel in) {
+    private MovieData(Parcel in) {
         mPosterPath = in.readString();
         mReleaseDate = in.readString();
         mOriginalTitle = in.readString();

@@ -7,10 +7,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class MainFragment extends Fragment {
+import java.util.ArrayList;
+
+public class MainFragment extends Fragment implements FetchMovieTask.AsyncResult {
 
     public MainFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void processData(ArrayList<MovieData> arrMovieData) {
+        // Received movie data from onPostExecute
     }
 
     @Override
