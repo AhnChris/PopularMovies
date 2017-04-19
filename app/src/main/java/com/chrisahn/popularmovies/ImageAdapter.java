@@ -5,11 +5,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
+import java.util.ArrayList;
+
 public class ImageAdapter extends BaseAdapter {
     private Context mContext;
+    private ArrayList<MovieData> mMovieDataArrayList;
 
-    public ImageAdapter(Context c) {
+    public ImageAdapter(Context c, ArrayList<MovieData> movieDataArrayList) {
         mContext = c;
+        mMovieDataArrayList = movieDataArrayList;
     }
     @Override
     public int getCount() {

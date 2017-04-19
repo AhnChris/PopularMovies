@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieData> > {
 
     // Interface to send data back to Fragment/Activity
-    public interface AsyncResult {
+    public interface AsyncResultCallBack {
         void processData(ArrayList<MovieData> arrMovieData);
     }
 
