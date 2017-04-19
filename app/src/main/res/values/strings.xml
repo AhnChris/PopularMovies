@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">PopularMovies</string>
+
+    <!-- MainFragment Spinner Sort Options -->
+    <string-array name="sort_options">
+        <item>Most Popular</item>
+        <item>Highest Rated</item>
+    </string-array>
 </resources>
