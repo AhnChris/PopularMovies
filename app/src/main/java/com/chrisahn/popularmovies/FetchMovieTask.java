@@ -4,6 +4,10 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +23,50 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieData>
     // Interface to send data back to Fragment/Activity
     public interface AsyncResultCallBack {
         void processData(ArrayList<MovieData> arrMovieData);
+    }
+
+    public AsyncResultCallBack callBack = null;
+
+    // Constructor
+    public FetchMovieTask(AsyncResultCallBack callBack) {
+        this.callBack = callBack;
+    }
+
+    /*
+    ** Helper function that will grab the following from the JSON str:
+    **  - poster_path
+    **  - release_data
+    **  - original_title
+    **  - vote_average
+    **  - overview
+    **
+    ** INPUT: jsonStr - The JSON response obtained from the db api call
+    ** RETURN: List of MovieData containers with the above specified components
+    **
+    **
+     */
+    private ArrayList<MovieData> getMovieDatafromJson(String jsonStr)
+    throws JSONException {
+        ArrayList<MovieData> movieDataArrayList = new ArrayList<>();
+
+        // Parse through JSON response and find array with results
+        JSONObject json = new JSONObject(jsonStr);
+        JSONArray results = json.getJSONArray("results");
+        for (int i = 0; i < results.length(); ++i) {
+            MovieData movieData = new MovieData();
+
+            // Find all corresponding movie data and set into movieData
+            JSONObject currentResult = results.getJSONObject(i);
+            movieData.setPosterPath(currentResult.getString("poster_path"));
+            movieData.setOverview(currentResult.getString("overview"));
+            movieData.setReleaseDate(currentResult.getString("release_date"));
+            movieData.setOriginalTitle(currentResult.getString("original_title"));
+            movieData.setVoteAverage(currentResult.getDouble("vote_average"));
+
+            // Add into list
+            movieDataArrayList.add(movieData);
+        }
+        return movieDataArrayList;
     }
 
     @Override
@@ -92,11 +140,20 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieData>
                 }
             }
         }
+
+        // Collect all necessary movie data
+        try {
+            return getMovieDatafromJson(jsonResponseStr);
+        } catch (JSONException e) {
+            // Log Error
+            Log.e(LOG_TAG, e.getMessage(), e);
+            e.printStackTrace();
+        }
         return null;
     }
 
     @Override
-    protected void onPostExecute(ArrayList<MovieData> movieDatas) {
-        super.onPostExecute(movieDatas);
+    protected void onPostExecute(ArrayList<MovieData> movieData) {
+        callBack.processData(movieData);
     }
 }
