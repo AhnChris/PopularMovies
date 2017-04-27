@@ -3,6 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item android:id="@+id/main_fragment_spinner_item"
-          android:title="Sort Options"/>
+          android:title="Sort"
+          app:showAsAction="always"
+          app:actionViewClass="android.widget.Spinner"/>
 
 </menu>
