@@ -25,7 +25,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieData>
         void processData(ArrayList<MovieData> arrMovieData);
     }
 
-    public AsyncResultCallBack callBack = null;
+    private AsyncResultCallBack callBack = null;
 
     // Constructor
     public FetchMovieTask(AsyncResultCallBack callBack) {
@@ -149,6 +149,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieData>
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
         }
+
         return null;
     }
 

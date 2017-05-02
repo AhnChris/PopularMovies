@@ -11,11 +11,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.GridView;
 import android.widget.Spinner;
 
 import java.util.ArrayList;
 
 public class MainFragment extends Fragment implements FetchMovieTask.AsyncResultCallBack {
+
+    private ImageAdapter mImageAdapter = null;
 
     public MainFragment() {
         // Required empty public constructor
@@ -24,6 +27,12 @@ public class MainFragment extends Fragment implements FetchMovieTask.AsyncResult
     @Override
     public void processData(ArrayList<MovieData> arrMovieData) {
         // Implement AsyncResultCallBack interface from FetchMovieTask
+        if (!arrMovieData.isEmpty()) {
+            for (MovieData item : arrMovieData) {
+                mImageAdapter.add(item);
+            }
+            mImageAdapter.notifyDataSetChanged();
+        }
 
     }
 
@@ -55,8 +64,17 @@ public class MainFragment extends Fragment implements FetchMovieTask.AsyncResult
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_main, container, false);
+        // Inflate main fragment layout
+        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        GridView gridView = (GridView) rootView.findViewById(R.id.movieGrid);
+
+        FetchMovieTask.AsyncResultCallBack callback = this;
+        FetchMovieTask fetchMovieTask = new FetchMovieTask(callback);
+        fetchMovieTask.execute("popularity.desc");
+        mImageAdapter = new ImageAdapter(getActivity(), new ArrayList<MovieData>());
+        gridView.setAdapter(mImageAdapter);
+
+        return rootView;
     }
 
 }
