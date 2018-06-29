@@ -35,7 +35,13 @@ import retrofit2.Response;
 public class MainFragment extends Fragment {
 
     private static final String LOG_TAG = MainFragment.class.getSimpleName();
+    private static final String SPINNER_POSITION_TAG = "SPINNER_POSITION_TAG";
+
     private GridViewAdapter mGridAdapter;
+    private List<MovieInfo> mMovieInfoList;
+
+    private boolean mFromSavedSpinnerState = false;
+    private int mSpinnerPosition;
 
     public MainFragment() {
 
@@ -43,11 +49,14 @@ public class MainFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // Clear any existing menu
+        menu.clear();
+
         // Inflate the menu menu layout
         inflater.inflate(R.menu.fragment_main_menu, menu);
         // Grab the spinner menu item and set spinner
         MenuItem menuItem = menu.findItem(R.id.main_fragment_spinner_item);
-        Spinner spinner = (Spinner) MenuItemCompat.getActionView(menuItem);
+        final Spinner spinner = (Spinner) MenuItemCompat.getActionView(menuItem);
 
         // TODO: Possibly make a custom spinner item & drop-down item layout
         // Set spinner string array and use default spinner layout
@@ -62,16 +71,20 @@ public class MainFragment extends Fragment {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position == 0) {
-                    // Most popular sort was picked
-                    getMovieListings("popularity.desc");
+                // Check if we have a saved spinner state
+                if (mFromSavedSpinnerState) {
+                    mFromSavedSpinnerState = false;
+                    spinner.setSelection(mSpinnerPosition);
 
-                    Log.d(LOG_TAG, "Sorting by most popular");
+                    Log.d(LOG_TAG, "Resumed previous spinner state at position: " + mSpinnerPosition);
                 } else {
-                    getMovieListings("vote_average.desc");
+                    mSpinnerPosition = position;
 
-                    Log.d(LOG_TAG, "Sorting by highest vote average");
+                    Log.d(LOG_TAG, "Position: " + mSpinnerPosition + " clicked");
                 }
+
+                String sortParam = getResources().getStringArray(R.array.sort_query_param)[mSpinnerPosition];
+                getMovieListings(sortParam);
             }
 
             @Override
@@ -95,8 +108,11 @@ public class MainFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         GridView gridView = (GridView) rootView.findViewById(R.id.movieGrid);
 
+
+        mMovieInfoList = new ArrayList<>();
+
         // Set the adapter for the GridView
-        mGridAdapter= new GridViewAdapter(getContext(), new ArrayList());
+        mGridAdapter = new GridViewAdapter(getContext(), mMovieInfoList);
         gridView.setAdapter(mGridAdapter);
 
         // Set an ItemClickListener for the GridView
@@ -107,7 +123,21 @@ public class MainFragment extends Fragment {
             }
         });
 
+        // Check if we have any saved-state data
+        if (savedInstanceState != null) {
+            mSpinnerPosition = savedInstanceState.getInt(SPINNER_POSITION_TAG);
+            mFromSavedSpinnerState = true;
+        }
+
         return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putInt(SPINNER_POSITION_TAG, mSpinnerPosition);
+        super.onSaveInstanceState(outState);
+
+        Log.d(LOG_TAG, "Saved spinner position state of: " + mSpinnerPosition);
     }
 
     private void getMovieListings(String sortParam) {
@@ -119,12 +149,12 @@ public class MainFragment extends Fragment {
         call.enqueue(new Callback<DiscoverMovieResponse>() {
             @Override
             public void onResponse(Call<DiscoverMovieResponse> call, Response<DiscoverMovieResponse> response) {
-                List<MovieInfo> movieInfoList = response.body().getMovieInfoList();
+                mMovieInfoList = response.body().getMovieInfoList();
                 // Update gridview adapter with new data
-                mGridAdapter.setAdapterData(movieInfoList);
+                mGridAdapter.setAdapterData(mMovieInfoList);
 
                 Log.d(LOG_TAG, "Successful request: " + call.request().url().toString());
-                Log.d(LOG_TAG, "Results came back with size of: " + movieInfoList.size());
+                Log.d(LOG_TAG, "Results came back with size of: " + mMovieInfoList.size());
 
             }
 

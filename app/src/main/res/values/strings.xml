@@ -7,4 +7,9 @@
         <item>Most Popular</item>
         <item>Highest Rated</item>
     </string-array>
+    <!-- Query Sort param -->
+    <string-array name="sort_query_param">
+        <item>popularity.desc</item>
+        <item>vote_average.desc</item>
+    </string-array>
 </resources>
